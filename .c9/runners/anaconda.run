@@ -1,0 +1,15 @@
+// This file overrides the built-in Python runner
+// For more information see http://docs.c9.io:8080/#!/api/run-method-run
+{
+  "cmd": [
+    "/home/ubuntu/anaconda/bin/python",
+    "$file",
+    "$args"
+  ],
+  "selector": "^.*\\.(python|py)$",
+  "env" : {
+    "PYTHONPATH":"/home/ubuntu/programming/cortipy:/home/ubuntu/programming/python-goose/goose:/home/ubuntu/caffe/python/python-client-sdk:/home/ubuntu/caffe/python:/home/ubuntu/programming/cortipy:/home/ubuntu/programming/python-goose/goose:/home/ubuntu/caffe/python/python-client-sdk:/home/ubuntu/caffe/python:/home/ubuntu/programming/cortipy:/home/ubuntu/programming/python-goose/goose:/home/ubuntu/caffe/python/python-client-sdk:/home/ubuntu/caffe/python:/home/ubuntu/programming/cortipy:/home/ubuntu/programming/python-goose/goose:/home/ubuntu/caffe/python/python-client-sdk:/home/ubuntu/caffe/python::/home/ubuntu/caffe/python:/home/ubuntu/caffe/python:/home/ubuntu/caffe/python",
+    "PATH":"/home/ubuntu/torch-distro/install/bin:/home/ubuntu/anaconda/bin:/usr/local/cuda/bin:/usr/local/cuda/bin:/usr/local/cuda/bin:/home/ubuntu/torch-distro/install/bin:/home/ubuntu/anaconda/bin:/usr/local/cuda/bin:/usr/local/cuda/bin:/usr/local/cuda/bin:/home/ubuntu/torch-distro/install/bin:/home/ubuntu/anaconda/bin:/usr/local/cuda/bin:/home/ubuntu/torch-distro/install/bin:/home/ubuntu/anaconda/bin:/usr/local/cuda/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/cuda/bin:/usr/local/cuda/bin:/usr/local/cuda-7.0/bin:/usr/local/cuda/bin:/usr/local/cuda/bin:/usr/local/cuda-7.0/bin:/usr/local/cuda/bin:/usr/local/cuda/bin",
+    "LD_LIBRARY_PATH":":/home/ubuntu/nupic/build/lib::/usr/local/lib::/usr/local/cuda/lib64"
+  }
+}
