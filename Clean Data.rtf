@@ -1,0 +1,149 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf130
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red38\green38\blue38;
+}
+\margl1440\margr1440\vieww13420\viewh15680\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 DATA CLEANING AND MUNGING FOR ROSSMANN KAGGLE PROJECT\
+___________________________________________\
+\
+\
+DATA DESCRIPTION\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://www.kaggle.com/c/rossmann-store-sales/data"}}{\fldrslt \cf0 https://www.kaggle.com/c/rossmann-store-sales/data}}\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+TRAIN\
+\'95 Store		Use as a Factor\
+* Date			Extract Day, Month, Year\
+\'95\'a0Sales		Y\
+\'95\'a0Customers		- Why doesn\'92t H2O not use customers?\
+\'95 Open		Delete rows with open = 0\
+\'95\'a0Promo		OK\
+\'95 State Holiday 	OK to use in R, need to convert to categorical in Python\
+\'95\'a0SchoolHoliday	OK\
+\
+\
+CHANGE OPEN TO 0 FOR OBVIOUS CASES\
+- Change Open to 0 when sales and/or customers = 0\
+- Delete rows from Train  (only when we are ready to start model building)\
+\
+ADD DATE FEATURES\
+- Extract Day, Month, Year from Date\
+- extract day of the year 	\
+- day_of_year\
+- weekofyear\
+- quarter\
+- is_month_start\
+- is_month_end\
+- is_quarter_start\
+- is_quarter_end\
+\
+- STATE HOLIDAYS\
+- 0 is being used as a string and as an integer - CORRECT\
+\
+PROMO PERIOD\
+- Add first day of Promo period\
+\
+MEAN STORES AND CUSTOMERS (by PROMO too)\
+- mean_sales_week\
+- mean_sales_month\
+- mean_sales_quarter\
+- mean_sales_year\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 - mean_customers_week\
+- mean_customers_month\
+- mean_customers_quarter\
+- mean_customers_year\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
+REFURBISHMENT\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 - sort by store, date (necessary to get days after/before refurb AND start of Promo)\
+- get PromoFirstDate\
+- add closed column (necessary for refurb)\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 - first day of refurbishment (open = o, so row will be deleted anyway)\
+- days from refurbishment\
+- days after refurbishment\
+\
+\
+EXTERNAL DATA\
+- state in which store is at 		(states.csv)		\
+		{\field{\*\fldinst{HYPERLINK "https://www.kaggle.com/c/rossmann-store-sales/forums/t/17048/putting-stores-on-the-map/"}}{\fldrslt https://www.kaggle.com/c/rossmann-store-sales/forums/t/17048/putting-stores-on-the-map/}}\
+		{\field{\*\fldinst{HYPERLINK "https://gist.github.com/gereleth/781a92c97b58b07a11e2#file-putting_stores_on_map-ipynb"}}{\fldrslt https://gist.github.com/gereleth/781a92c97b58b07a11e2#file-putting_stores_on_map-ipynb}}\
+- Weather\
+		{\field{\*\fldinst{HYPERLINK "https://www.kaggle.com/c/rossmann-store-sales/forums/t/17058/weather-at-berlin-us-airport/97075"}}{\fldrslt https://www.kaggle.com/c/rossmann-store-sales/forums/t/17058/weather-at-berlin-us-airport/97075}}\
+- Google Trends\
+		{\field{\*\fldinst{HYPERLINK "https://www.kaggle.com/c/rossmann-store-sales/forums/t/17130/google-trends/97196"}}{\fldrslt https://www.kaggle.com/c/rossmann-store-sales/forums/t/17130/google-trends/97196}}\
+- Macroeconomic data\
+		{\field{\*\fldinst{HYPERLINK "https://www.kaggle.com/c/rossmann-store-sales/forums/t/17111/macro-indicators"}}{\fldrslt https://www.kaggle.com/c/rossmann-store-sales/forums/t/17111/macro-indicators}}\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 ++++++++++++++++++++++++++++++\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 TEST\
+\'95\'a0store 622 has Nan for Open feature \
+- Change these NaNs to 1\
+- Do we need to extract date info?\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 ++++++++++++++++++++++++++++++\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 STORE\
+\'95\'a0\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 CompetitionDistance			has NaNs\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \'95\'a0\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 CompetitionOpenSinceMonth		\cf0 \cb1 \outl0\strokewidth0 has NaNs\cf2 \cb3 \outl0\strokewidth0 \strokec2 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \'95\'a0\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 CompetitionOpenSinceYear		\cf0 \cb1 \outl0\strokewidth0 has NaNs\cf2 \cb3 \outl0\strokewidth0 \strokec2 \
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \'95\'a0\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Promo2SinceWeek			\cf0 \cb1 \outl0\strokewidth0 has NaNs\cf2 \cb3 \outl0\strokewidth0 \strokec2 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \'95\'a0\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Promo2SinceYear				\cf0 \cb1 \outl0\strokewidth0 has NaNs\cf2 \cb3 \outl0\strokewidth0 \strokec2 \
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \'95\'a0\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 PromoInterval				\cf0 \cb1 \outl0\strokewidth0 has NaNs\
+\
+\
+- \cf4 \cb3 \outl0\strokewidth0 \strokec4 CompetitionOpenSinceYear, CompetitionOpenSinceMonth and \'931\'94 were combined to create a \'93CompetitionOpenDate\'94 variable???\
+- {\field{\*\fldinst{HYPERLINK "https://www.kaggle.com/amhchiu/rossmann-store-sales/more-exploratory-data-analysis/notebook"}}{\fldrslt https://www.kaggle.com/amhchiu/rossmann-store-sales/more-exploratory-data-analysis/notebook}}\cb1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \outl0\strokewidth0 \
+NaNs IN STORE\
+- What to do with NaNs?\
+- {\field{\*\fldinst{HYPERLINK "http://stackoverflow.com/questions/27824954/how-to-handle-missing-nans-for-machine-learning-in-python"}}{\fldrslt http://stackoverflow.com/questions/27824954/how-to-handle-missing-nans-for-machine-learning-in-python}}\
+- {\field{\*\fldinst{HYPERLINK "https://www.quora.com/What-are-the-best-ways-to-account-for-missing-data-in-machine-learning"}}{\fldrslt https://www.quora.com/What-are-the-best-ways-to-account-for-missing-data-in-machine-learning}}\
+\
+\
+STORE TYPE\
+\
+- Store type "b" seem to (almost) always be open on holidays, unlike the other types\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf2 \cb3 \outl0\strokewidth0 \strokec2 \
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 ++++++++++++++++++++++++++++++\
+\
+\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+JOIN\
+- join train + store\
+- join test + store\
+\cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+- join train_store_states\
+- join test_store_states\
+++++++++++++++++++++++++++++++\
+\
+\cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+EXPORT CSV\
+\
+- Use log(Sales) instead of Sales\
+- Use Store as factor\
+\
+}
