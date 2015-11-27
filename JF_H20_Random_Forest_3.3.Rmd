@@ -35,15 +35,15 @@ library(h2o)
 library(dplyr)
 
 # localH2O = h2o.init()
-localH2O = h2o.init(nthreads = -1, max_mem_size = '6g')
+localH2O = h2o.init(nthreads = -1, max_mem_size = '4g')
 
 cat("reading the train and test data (with data.table) \n")
-train <- fread("data/train_states_R.csv",stringsAsFactors = T)
-# train <- fread("data/train.csv",stringsAsFactors = T)
-str(train)
-test  <- fread("data/test_states_R.csv",stringsAsFactors = T)
-# test  <- fread("data/test.csv",stringsAsFactors = T)
-str(test)
+train <- fread("../data/train.csv",stringsAsFactors = T)
+#str(train)
+dd = fread("../data/train.csv",stringsAsFactors = T)
+test  <- fread("../data/test.csv",stringsAsFactors = T)
+#str(test)
+
 store <- fread("data/store.csv",stringsAsFactors = T)
 train <- train[Sales > 0,]  ## We are not judged on 0 sales records in test set
 ## See Scripts discussion from 10/8 for more explanation.
@@ -88,13 +88,6 @@ test[,Store:=as.factor(as.numeric(Store))]
 train[,logSales:=log1p(Sales)]
 ```
 
-## Use H2O's random forest
-## Start cluster with all available threads
-
-```{r}
-# h2o.init(nthreads=-1,max_mem_size='6G')
-```
-
 ## Load data into cluster from R
 
 ```{r}
@@ -109,8 +102,8 @@ features<-colnames(train)[!(colnames(train) %in% c( "V1","Id","Date","Sales","lo
 
 ## Train a random forest using all default parameters
 ```{r}
-trees = 30
-depth = 55
+trees = 300
+depth = 25
 rfHex <- h2o.randomForest(x=features,
                           y="logSales", 
                           ntrees = trees, 
@@ -122,6 +115,9 @@ rfHex <- h2o.randomForest(x=features,
 
 ```{r}
 summary(rfHex)
+
+varimps = data.frame(h2o.varimp(rfHex))
+varimps
 cat("Predicting Sales\n")
 ```
 
@@ -141,6 +137,9 @@ h2o.saveModel(rfHex_50_55_2, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O
 
 rfHex_50_55_3 = rfHex
 h2o.saveModel(rfHex_50_55_3, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models', force = FALSE)
+
+rfHex_30_50_3 = rfHex
+h2o.saveModel(rfHex_30_50_3, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_v2', force = FALSE)
 
 ```
 
@@ -182,8 +181,68 @@ predictions<-as.data.frame(h2o.predict(rfHex,testHex))
 pred <- expm1(predictions[,1])
 submission <- data.frame(Id=test$Id, Sales=pred)
 cat("saving the submission file\n")
-write.csv(submission, "./H2O_submits/h2o_50_55_3_multiplied_results_by_1_02.csv",row.names=F)
+write.csv(submission, "./H2O_submits/h2o_30_50_v2.csv",row.names=F)
 ```
+
+## Doing predictions one at a time and updating the test table with sales:
+```{r}
+new_pred = data.frame()
+temp = filter(test, day_of_year == 213)
+test2 = temp
+for (i in 214:261) {
+  temp = as.h2o(temp)
+  temp_pred = as.data.frame(h2o.predict(rfHex,temp))
+  new_pred = rbind(new_pred, temp_pred)
+  
+  if (i == 261) { next }
+  temp = filter(test, day_of_year == i)
+  temptest = filter(test2, day_of_year == i-1)
+  temp$Sales1 = as.data.frame(expm1(temp_pred))
+  for (j in 2:21) {
+    temp[[paste0('Sales',j)]] = temptest[[paste0('Sales',j-1)]]
+  }
+  test2 = rbind(test2, temp)
+}
+
+new_pred <- expm1(new_pred[,1])
+new_submission <- data.frame(Id=test$Id, Sales=new_pred)
+cat("saving the submission file\n")
+write.csv(new_submission, "./H2O_submits/h2o_30_50_v4.csv",row.names=F)
+```
+
+
+
+## Scratch code to test things
+```{r}
+aaa=filter(test, day_of_year == 213)
+aaa$Sales1[846:856]
+round(pred[846:856])
+round(new_pred[846:856])
+unique(test$day_of_year)
+
+length(pred)
+nrow(new_pred)
+
+class(pred)
+class(new_pred)
+
+select(test,contains("Sales"))
+select(test2,contains("Sales"))
+
+sum(is.na(test$Sales1))
+sum(is.na(test2$Sales1))
+sum(is.na(test2$Sales2))
+
+unique(train$Open)
+aa = filter(train, Store == 10)
+bb = filter(test2, Store == 10)
+aa = aa$Sales
+bb = bb$Sales1
+cc = c(aa,bb)
+plot(cc)
+```
+
+
 
 ## Appendix: h2o.randomForest API
 * h2o.randomForest(x, y, training_frame, model_id, validation_frame, checkpoint,
