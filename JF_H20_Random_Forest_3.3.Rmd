@@ -35,12 +35,12 @@ library(h2o)
 library(dplyr)
 
 # localH2O = h2o.init()
-localH2O = h2o.init(nthreads = -1, max_mem_size = '4g')
+localH2O = h2o.init(nthreads = -1, max_mem_size = '6g', assertion = FALSE)
 
 cat("reading the train and test data (with data.table) \n")
 train <- fread("../data/train.csv",stringsAsFactors = T)
 #str(train)
-dd = fread("../data/train.csv",stringsAsFactors = T)
+
 test  <- fread("../data/test.csv",stringsAsFactors = T)
 #str(test)
 
@@ -97,13 +97,14 @@ trainHex<-as.h2o(train)
 ## Set up variable to use all features other than those specified here
 
 ```{r}
-features<-colnames(train)[!(colnames(train) %in% c( "V1","Id","Date","Sales","logSales","Customers"))]
+features<-colnames(train)[!(colnames(train) %in% c( "V1","Id","Date","Sales","logSales",
+                                                    "Customers","Open","type","SH_IMM_MEAS"))]
 ```
 
 ## Train a random forest using all default parameters
 ```{r}
-trees = 300
-depth = 25
+trees = 50
+depth = 60
 rfHex <- h2o.randomForest(x=features,
                           y="logSales", 
                           ntrees = trees, 
@@ -115,7 +116,6 @@ rfHex <- h2o.randomForest(x=features,
 
 ```{r}
 summary(rfHex)
-
 varimps = data.frame(h2o.varimp(rfHex))
 varimps
 cat("Predicting Sales\n")
@@ -183,6 +183,8 @@ submission <- data.frame(Id=test$Id, Sales=pred)
 cat("saving the submission file\n")
 write.csv(submission, "./H2O_submits/h2o_30_50_v2.csv",row.names=F)
 ```
+
+
 
 ## Doing predictions one at a time and updating the test table with sales:
 ```{r}
