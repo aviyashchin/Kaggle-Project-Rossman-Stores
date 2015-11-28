@@ -103,8 +103,8 @@ features<-colnames(train)[!(colnames(train) %in% c( "V1","Id","Date","Sales","lo
 
 ## Train a random forest using all default parameters
 ```{r}
-trees = 50
-depth = 60
+trees = 150
+depth = 40
 rfHex <- h2o.randomForest(x=features,
                           y="logSales", 
                           ntrees = trees, 
@@ -140,6 +140,9 @@ h2o.saveModel(rfHex_50_55_3, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O
 
 rfHex_30_50_3 = rfHex
 h2o.saveModel(rfHex_30_50_3, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_v2', force = FALSE)
+
+rfHex_50_60_v2_data = rfHex
+h2o.saveModel(rfHex_50_60_v2_data, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_v2', force = FALSE)
 
 ```
 
@@ -181,7 +184,7 @@ predictions<-as.data.frame(h2o.predict(rfHex,testHex))
 pred <- expm1(predictions[,1])
 submission <- data.frame(Id=test$Id, Sales=pred)
 cat("saving the submission file\n")
-write.csv(submission, "./H2O_submits/h2o_30_50_v2.csv",row.names=F)
+write.csv(submission, "./H2O_submits/h2o_50_60_v2_data.csv",row.names=F)
 ```
 
 
