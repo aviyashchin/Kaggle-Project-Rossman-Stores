@@ -10,6 +10,7 @@ cat("reading the train and test data (with data.table) \n")
 train <- fread("../data/train.csv",stringsAsFactors = T)
 test  <- fread("../data/test.csv",stringsAsFactors = T)
 store <- fread("data/store.csv",stringsAsFactors = T)
+
 train <- train[Sales > 0,]  ## We are not judged on 0 sales records in test set
 train <- merge(train,store,by="Store")
 test <- merge(test,store,by="Store")
