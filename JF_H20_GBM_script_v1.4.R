@@ -1,5 +1,4 @@
 # H2O GBM script version 1
-
 library(caret)
 library(plyr)
 library(dplyr)
@@ -43,9 +42,9 @@ str(test)
 
 # Set appropriate variables to factors
 for (j in c("Store", "DayOfWeek", "Promo", 
-            "year", "month", 
+            "year", "month", "day", "PromoFirstDate",
 #            "day", "day_of_year", "week_of_year", "PromoFirstDate",
-#            "State", "PromoSecondDate", "DayBeforeClosed", "DayAfterClosed",
+            "State", "PromoSecondDate", #"DayBeforeClosed", "DayAfterClosed",
             "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
             "Promo2", "Promo2SinceWeek", "Promo2SinceYear")) {
   train[[j]] <- as.factor(train[[j]])
@@ -94,27 +93,8 @@ h2o.init(nthreads=-1,max_mem_size='5G', assertion = FALSE)
 
 ## Load data into cluster from R
 trainHex<-as.h2o(train)
-features<- c('Sales_day_avg', 'day_of_year', 'day', 'Sales_month_avg', 'weeknum', 'State',
-             'Open1', 'is_month_end', 'DayOfWeek', 'ConsConf', 'DAX', 'Open4', 'Sales_all_avg',
-             'Open-1', 'Open-3', 'is_quarter_end', 'month', 'Assortment', 'CompetitionDistance',
-             'Promo', 'CompetitionOpenSinceYear', 'StoreType', 'Promo2SinceYear', 'CompetitionOpenSinceMonth',
-             'Events6', 'Store', 'PromoInterval', 'MSCI', 'CLeadIndic', 'Competition', 'Events13',
-             'SchoolHoliday', 'Mean_Sea_Level_PressurehPa', 'Max_TemperatureC', 'Open8', 'Merck',
-             'Events-1', 'Events', 'Events2', 'Open-2', 'StateHoliday', 'Events10', 'Open11', 'Events1',
-             'Mean_TemperatureC14', 'Open-6', 'Events4', 'Events-2', 'Events3', 'quarter',
-             'Min_Sea_Level_PressurehPa', 'Events9', 'Precipitationmm', 'Events8', 'Events7',
-             'Max_Sea_Level_PressurehPa', 'Events14', 'BusConf', 'Events11', 'Promo2SinceWeek',
-             'Events12', 'Open20', 'Events-3', 'Events5', 'Min_Humidity', 'Open-15', 'Mean_TemperatureC-3',
-             'Mean_TemperatureC3', 'Mean_TemperatureC1', 'Mean_TemperatureC8', 'Mean_TemperatureC2',
-             'PromoFirstDate', 'Mean_TemperatureC13', 'Mean_TemperatureC', 'Max_Wind_SpeedKm_h1',
-             'Mean_Wind_SpeedKm_h', 'Mean_TemperatureC4', 'Open-10', 'Mean_TemperatureC9', 'MeanDew_PointC',
-             'Open15', 'Mean_TemperatureC-2', 'Open12', 'Open7', 'Max_Wind_SpeedKm_h2', 'Dew_PointC',
-             'Mean_TemperatureC7', 'Mean_TemperatureC12', 'Mean_Humidity', 'WindDirDegrees',
-             'Mean_TemperatureC-1', 'Min_TemperatureC', 'Open5', 'CloudCover', 'Mean_TemperatureC5',
-             'Mean_TemperatureC11', 'Mean_TemperatureC6', 'Mean_TemperatureC10', 'Mean_VisibilityKm',
-             'Max_Wind_SpeedKm_h8', "Store", "DayOfWeek", "Promo", "year", "month", "CompetitionOpenSinceMonth", 
-             "CompetitionOpenSinceYear", "Promo2", "Promo2SinceWeek", "Promo2SinceYear")
-features = unique(features)
+features<-names(train)[!(names(train) %in% c("Id","Date","Sales","logSales", "Customers"))]
+features
 
 ####################################################################################
 gbmHex <- h2o.gbm(x=features,
@@ -127,7 +107,7 @@ gbmHex <- h2o.gbm(x=features,
                   max_depth = 20,
                   learn_rate=0.05,
                   seed = 12345678, #Seed for random numbers (affects sampling) - Note: only reproducible when running single threaded
-                  ntrees = 300
+                  ntrees = 50
                   )
 
 summary(gbmHex)
