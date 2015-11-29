@@ -1,0 +1,154 @@
+Model Details:
+==============
+repeat v25 and set store to factor
+
+H2ORegressionModel: gbm
+Model Key:  introGBM 
+Model Summary: 
+  number_of_trees model_size_in_bytes min_depth max_depth mean_depth min_leaves max_leaves
+1             200            36610840        15        15   15.00000        442       4442
+  mean_leaves
+1  2550.03000
+
+H2ORegressionMetrics: gbm
+** Reported on training data. **
+
+MSE:  0.006521884
+R2 :  0.9640379
+Mean Residual Deviance :  0.006521884
+
+
+H2ORegressionMetrics: gbm
+** Reported on validation data. **
+
+MSE:  0.01145369
+R2 :  0.9334565
+Mean Residual Deviance :  0.01145369
+
+
+Scoring History: 
+             timestamp          duration number_of_trees training_MSE training_deviance
+1  2015-11-29 10:15:29         1.396 sec               1      0.16728           0.16728
+2  2015-11-29 10:15:30         3.030 sec               2      0.15335           0.15335
+3  2015-11-29 10:15:35         7.612 sec               5      0.12043           0.12043
+4  2015-11-29 10:15:40        12.821 sec               9      0.08876           0.08876
+5  2015-11-29 10:15:45        17.260 sec              12      0.07133           0.07133
+6  2015-11-29 10:15:49        21.462 sec              15      0.05827           0.05827
+7  2015-11-29 10:15:53        25.910 sec              18      0.04822           0.04822
+8  2015-11-29 10:15:58        30.493 sec              21      0.04057           0.04057
+9  2015-11-29 10:16:04        36.830 sec              25      0.03263           0.03263
+10 2015-11-29 10:16:11        43.945 sec              30      0.02587           0.02587
+11 2015-11-29 10:16:18        50.925 sec              35      0.02158           0.02158
+12 2015-11-29 10:16:28  1 min  0.333 sec              41      0.01802           0.01802
+13 2015-11-29 10:16:39  1 min 11.232 sec              49      0.01507           0.01507
+14 2015-11-29 10:16:52  1 min 24.329 sec              58      0.01301           0.01301
+15 2015-11-29 10:17:06  1 min 39.052 sec              70      0.01144           0.01144
+16 2015-11-29 10:17:24  1 min 56.682 sec              86      0.01003           0.01003
+17 2015-11-29 10:17:48  2 min 21.122 sec             109      0.00873           0.00873
+18 2015-11-29 10:18:19  2 min 51.294 sec             138      0.00769           0.00769
+19 2015-11-29 10:18:58  3 min 30.557 sec             176      0.00687           0.00687
+20 2015-11-29 10:19:25  3 min 57.311 sec             200      0.00652           0.00652
+   validation_MSE validation_deviance
+1         0.16001             0.16001
+2         0.14699             0.14699
+3         0.11632             0.11632
+4         0.08657             0.08657
+5         0.07041             0.07041
+6         0.05797             0.05797
+7         0.04883             0.04883
+8         0.04181             0.04181
+9         0.03448             0.03448
+10        0.02840             0.02840
+11        0.02454             0.02454
+12        0.02144             0.02144
+13        0.01878             0.01878
+14        0.01703             0.01703
+15        0.01556             0.01556
+16        0.01432             0.01432
+17        0.01302             0.01302
+18        0.01219             0.01219
+19        0.01162             0.01162
+20        0.01145             0.01145
+
+> gbmHex@parameters
+$model_id
+[1] "introGBM"
+
+$training_frame
+[1] "trainHex"
+
+$validation_frame
+[1] "validHex"
+
+$ntrees
+[1] 200
+
+$max_depth
+[1] 15
+
+$nbins_cats
+[1] 1115
+
+$seed
+[1] 12345678
+
+$learn_rate
+[1] 0.05
+
+$distribution
+[1] "gaussian"
+
+$sample_rate
+[1] 0.5
+
+$col_sample_rate
+[1] 0.5
+
+$x
+ [1] "Store"                     "DayOfWeek"                 "Promo"                    
+ [4] "StateHoliday"              "SchoolHoliday"             "year"                     
+ [7] "month"                     "day"                       "day_of_year"              
+[10] "week_of_year"              "PromoFirstDate"            "PromoSecondDate"          
+[13] "DayBeforeClosed"           "DayAfterClosed"            "SundayStore"              
+[16] "DayBeforeRefurb"           "DayAfterRefurb"            "DaysBeforeRefurb"         
+[19] "DaysAfterRefurb"           "State"                     "StoreType"                
+[22] "Assortment"                "CompetitionDistance"       "CompetitionOpenSinceMonth"
+[25] "CompetitionOpenSinceYear"  "Promo2"                    "Promo2SinceWeek"          
+[28] "Promo2SinceYear"           "PromoInterval"             "Competition"              
+
+$y
+[1] "logSales"
+
+> varimps = data.frame(h2o.varimp(gbmHex))
+> varimps
+                    variable relative_importance scaled_importance   percentage
+1                      Store        1.001570e+06      1.000000e+00 7.712940e-01
+2                      Promo        1.350492e+05      1.348374e-01 1.039993e-01
+3                  DayOfWeek        2.592186e+04      2.588121e-02 1.996202e-02
+4             PromoFirstDate        1.618955e+04      1.616416e-02 1.246732e-02
+5                day_of_year        1.453417e+04      1.451138e-02 1.119254e-02
+6                        day        1.433419e+04      1.431172e-02 1.103854e-02
+7                      State        1.356307e+04      1.354181e-02 1.044472e-02
+8             DayAfterClosed        1.189178e+04      1.187313e-02 9.157675e-03
+9               week_of_year        1.027012e+04      1.025401e-02 7.908860e-03
+10                     month        8.407201e+03      8.394019e-03 6.474257e-03
+11                 StoreType        6.927053e+03      6.916191e-03 5.334417e-03
+12           DayBeforeClosed        6.925411e+03      6.914552e-03 5.333153e-03
+13                      year        4.789898e+03      4.782388e-03 3.688627e-03
+14       CompetitionDistance        4.330800e+03      4.324010e-03 3.335083e-03
+15           PromoSecondDate        3.242240e+03      3.237156e-03 2.496799e-03
+16 CompetitionOpenSinceMonth        2.924926e+03      2.920340e-03 2.252440e-03
+17               Competition        2.911118e+03      2.906554e-03 2.241808e-03
+18  CompetitionOpenSinceYear        2.774550e+03      2.770199e-03 2.136638e-03
+19                Assortment        2.561862e+03      2.557845e-03 1.972850e-03
+20               SundayStore        1.692792e+03      1.690137e-03 1.303593e-03
+21           Promo2SinceYear        1.407896e+03      1.405689e-03 1.084199e-03
+22             SchoolHoliday        1.328950e+03      1.326866e-03 1.023404e-03
+23             PromoInterval        1.316984e+03      1.314919e-03 1.014189e-03
+24           Promo2SinceWeek        8.996371e+02      8.982265e-04 6.927967e-04
+25              StateHoliday        8.249736e+02      8.236800e-04 6.352995e-04
+26           DaysAfterRefurb        7.110106e+02      7.098957e-04 5.475383e-04
+27          DaysBeforeRefurb        6.090316e+02      6.080767e-04 4.690059e-04
+28                    Promo2        4.669441e+02      4.662119e-04 3.595865e-04
+29           DayBeforeRefurb        1.024033e+02      1.022428e-04 7.885923e-05
+30            DayAfterRefurb        7.849445e+01      7.837137e-05 6.044737e-05
