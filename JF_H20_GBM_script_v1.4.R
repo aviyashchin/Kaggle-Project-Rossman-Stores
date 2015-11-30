@@ -116,6 +116,15 @@ sumup(model = gbmHex, trainHex = trainHex, train = train)
 gbm_20_05_50_forVarImp = gbmHex
 h2o.saveModel(gbm_20_05_50_forVarImp, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_GBM_varImp', force = FALSE)
 
+cat("Predicting Sales\n")
+testHex<-as.h2o(test)
+predictions<-as.data.frame(h2o.predict(gbmHex,testHex))
+pred <- expm1(predictions[,1])
+summary(pred)
+submission <- data.frame(Id=test$Id, Sales=pred)
+cat("saving the submission file\n")
+write.csv(submission, "./H2O_submits/h2o_GBM_20_05_50_top100.csv",row.names=F)
+
 ####################################################################################
 features2 = c(varimps$variable[1:100],"DaysAfterRefurb", "DayAfterRefurb")
 
@@ -137,10 +146,19 @@ sumup(model = gbmHex2, trainHex = trainHex, train = train)
 gbm_20_05_50_v3 = gbmHex2
 h2o.saveModel(gbm_20_05_50_v3, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_GBM_v3', force = FALSE)
 
+cat("Predicting Sales\n")
+testHex2     <- as.h2o(test)
+predictions2 <- as.data.frame(h2o.predict(gbmHex2,testHex2))
+pred2        <- expm1(predictions2[,1])
+summary(pred2)
+
+submission2  <- data.frame(Id=test$Id, Sales=pred2)
+cat("saving the submission file\n")
+write.csv(submission2, "./H2O_submits/h2o_GBM_20_05_300_top100.csv",row.names=F)
+
+
 ####################################################################################
-temp = c(varimps2$variable[1:80], "Store", "DayOfWeek", "Promo", "year", "month", "CompetitionOpenSinceMonth", 
-         "CompetitionOpenSinceYear", "Promo2", "Promo2SinceWeek", "Promo2SinceYear")
-features3 = unique(temp)
+features3 = c(varimps2$variable[1:30])
 
 gbmHex3 <- h2o.gbm( x=features3,
                     y="logSales",
@@ -149,42 +167,26 @@ gbmHex3 <- h2o.gbm( x=features3,
                     nbins_cats=1115,
                     sample_rate = 0.5,
                     col_sample_rate = 0.5,
-                    max_depth = 20,
-                    learn_rate=0.1,
+                    max_depth = 15,
+                    learn_rate=0.05,
                     seed = 12345678, #Seed for random numbers (affects sampling) - Note: only reproducible when running single threaded
-                    ntrees = 50)
+                    ntrees = 300)
 
 summary(gbmHex3)
 (varimps3 = data.frame(h2o.varimp(gbmHex3)))
-
-####################################################################################
-
-train_pred = as.data.frame(h2o.predict(gbmHex,trainHex))
-train_pred <- expm1(train_pred[,1])
-train_pred = train_pred
-train$pred = train_pred
-train$rmse = rmse(train_pred, train$Sales)
-train2 = filter(train, month %in% c(8,9))
-(total_rmse = sqrt(sum(train$rmse)/nrow(train)))
-(partial_rmse = sqrt(sum(train2$rmse)/nrow(train2)))
-sumup = as.data.frame(rbind(summary(train_pred), summary(train$Sales), summary(train2$pred), summary(train2$Sales)))
-sumup$sd = c(round(sd(train_pred)), round(sd(train$Sales)), round(sd(train2$pred)), round(sd(train2$Sales)))
-sumup
-
-####################################################################################
+sumup(model = gbmHex3, trainHex = trainHex, train = train)
+gbm_15_05_300_top30 = gbmHex3
+h2o.saveModel(gbm_15_05_300_top30, path = '../H2O_models_GBM_top30', force = FALSE)
 
 cat("Predicting Sales\n")
-## Load test data into cluster from R
-testHex<-as.h2o(test)
+testHex3     <- as.h2o(test)
+predictions3 <- as.data.frame(h2o.predict(gbmHex3,testHex3))
+pred3        <- expm1(predictions3[,1])
+summary(pred3)
 
-## Get predictions out; predicts in H2O, as.data.frame gets them into R
-predictions<-as.data.frame(h2o.predict(gbmHex,testHex))
-## Return the predictions to the original scale of the Sales data
-pred <- expm1(predictions[,1])
-summary(pred)
-submission <- data.frame(Id=test$Id, Sales=pred)
+submission3  <- data.frame(Id=test$Id, Sales=pred3)
 cat("saving the submission file\n")
-write.csv(submission, "./H2O_submits/h2o_GBM_20_05_300_v3.csv",row.names=F)
+write.csv(submission3, "./H2O_submits/h2o_GBM_20_05_300_top30.csv",row.names=F)
 
 ####################################################################################
 sub1 <- fread("./H2O_submits/h2o_30_60.csv",stringsAsFactors = T)
@@ -206,3 +208,5 @@ write.csv(new_sub, "./H2O_submits/ensemble_test_v1.csv",row.names=F)
 new_sub2 = (sub1+sub2+sub4+sub5)/4
 mean(new_sub2$Sales)
 write.csv(new_sub2, "./H2O_submits/ensemble_test_v2.csv",row.names=F)
+
+####################################################################################

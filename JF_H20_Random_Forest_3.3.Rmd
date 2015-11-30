@@ -83,6 +83,7 @@ rfHex <- h2o.randomForest(x=features,
                           nbins_cats = 1115, ## allow it to fit store ID
                           training_frame=trainHex)
 
+?h2o.randomForest
 ```
 
 ```{r}
