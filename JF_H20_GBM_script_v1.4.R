@@ -113,12 +113,11 @@ gbmHex <- h2o.gbm(x=features,
 summary(gbmHex)
 (varimps = data.frame(h2o.varimp(gbmHex)))
 sumup(model = gbmHex, trainHex = trainHex, train = train)
-gbm_20_05_300 = gbmHex
-h2o.saveModel(gbm_20_05_300, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models', force = FALSE)
-
+gbm_20_05_50_forVarImp = gbmHex
+h2o.saveModel(gbm_20_05_50_forVarImp, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_GBM_varImp', force = FALSE)
 
 ####################################################################################
-features2 = varimps$variable[1:100]
+features2 = c(varimps$variable[1:100],"DaysAfterRefurb", "DayAfterRefurb")
 
 gbmHex2 <- h2o.gbm( x=features2,
                     y="logSales",
@@ -127,13 +126,16 @@ gbmHex2 <- h2o.gbm( x=features2,
                     nbins_cats=1115,
                     sample_rate = 0.5,
                     col_sample_rate = 0.5,
-                    max_depth = 15,
+                    max_depth = 20,
                     learn_rate=0.05,
                     seed = 12345678, #Seed for random numbers (affects sampling) - Note: only reproducible when running single threaded
-                    ntrees = 50)
+                    ntrees = 300)
 
 summary(gbmHex2)
 (varimps2 = data.frame(h2o.varimp(gbmHex2)))
+sumup(model = gbmHex2, trainHex = trainHex, train = train)
+gbm_20_05_50_v3 = gbmHex2
+h2o.saveModel(gbm_20_05_50_v3, path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_GBM_v3', force = FALSE)
 
 ####################################################################################
 temp = c(varimps2$variable[1:80], "Store", "DayOfWeek", "Promo", "year", "month", "CompetitionOpenSinceMonth", 
@@ -182,5 +184,25 @@ pred <- expm1(predictions[,1])
 summary(pred)
 submission <- data.frame(Id=test$Id, Sales=pred)
 cat("saving the submission file\n")
-write.csv(submission, "./H2O_submits/h2o_GBM_20_05_300.csv",row.names=F)
+write.csv(submission, "./H2O_submits/h2o_GBM_20_05_300_v3.csv",row.names=F)
 
+####################################################################################
+sub1 <- fread("./H2O_submits/h2o_30_60.csv",stringsAsFactors = T)
+sub2 <- fread("./H2O_submits/h2o_30_80.csv",stringsAsFactors = T)
+sub3 <- fread("./H2O_submits/h2o_50_65.csv",stringsAsFactors = T)
+sub4 <- fread("./H2O_submits/h2o_GBM_20_05_300.csv",stringsAsFactors = T)
+sub5 <- fread("./H2O_submits/h2o_GBM_20_05_300_v3.csv",stringsAsFactors = T)
+
+mean(sub1$Sales)
+mean(sub2$Sales)
+mean(sub3$Sales)
+mean(sub4$Sales)
+mean(sub5$Sales)
+
+new_sub = (sub1+sub2+2*sub4+2*sub5)/6
+mean(new_sub$Sales)
+write.csv(new_sub, "./H2O_submits/ensemble_test_v1.csv",row.names=F)
+
+new_sub2 = (sub1+sub2+sub4+sub5)/4
+mean(new_sub2$Sales)
+write.csv(new_sub2, "./H2O_submits/ensemble_test_v2.csv",row.names=F)
