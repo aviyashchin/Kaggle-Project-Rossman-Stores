@@ -154,10 +154,10 @@ write.csv(train_pred, "./H2O_submits/h2o_GBM_20_03_800_top100_train.csv",row.nam
 write.csv(varimps2, "./H2O_submits/h2o_GBM_20_03_800_top100_varimp.csv",row.names=F)
 
 ####################################################################################
-a = c(1:20, seq(21,100,4))
-b = c(1:20, seq(22,100,4))
-c = c(1:20, seq(23,100,4))
-d = c(1:20, seq(24,100,4))
+a = c(1:2, seq(3,100,4))
+b = c(1:2, seq(4,100,4))
+c = c(1:2, seq(5,100,4))
+d = c(1:2, seq(6,100,4))
 
 ####################################################################################
 feats_a = c(varimps2$variable[a])
@@ -169,14 +169,14 @@ gbmHex_a <- h2o.gbm(x               = feats_a,
                     nbins_cats      = 1115,
                     sample_rate     = 0.5,
                     col_sample_rate = 0.5,
-                    max_depth       = 15,
+                    max_depth       = 20,
                     learn_rate      = 0.05,
                     seed            = 12345678,
-                    ntrees          = 300)
+                    ntrees          = 400)
 
 summary(gbmHex_a)
 gbm_15_05_300_a = gbmHex_a
-h2o.saveModel(gbm_15_05_300_a, path = '../H2O_models_GBM_15_05_300_v3_a', force = FALSE)
+h2o.saveModel(gbm_15_05_300_a, path = '../H2O_models_GBM_15_05_300_v4_a', force = FALSE)
 
 cat("Predicting Sales\n")
 testHex      <- as.h2o(test)
@@ -201,14 +201,14 @@ gbmHex_b <- h2o.gbm(x               = feats_b,
                     nbins_cats      = 1115,
                     sample_rate     = 0.5,
                     col_sample_rate = 0.5,
-                    max_depth       = 15,
+                    max_depth       = 20,
                     learn_rate      = 0.05,
                     seed            = 12345678,
-                    ntrees          = 300)
+                    ntrees          = 400)
 
 summary(gbmHex_b)
 gbm_15_05_300_b = gbmHex_b
-h2o.saveModel(gbm_15_05_300_b, path = '../H2O_models_GBM_15_05_300_v3_b', force = FALSE)
+h2o.saveModel(gbm_15_05_300_b, path = '../H2O_models_GBM_15_05_300_v4_b', force = FALSE)
 
 cat("Predicting Sales\n")
 testHex      <- as.h2o(test)
@@ -233,14 +233,14 @@ gbmHex_c <- h2o.gbm(x               = feats_c,
                     nbins_cats      = 1115,
                     sample_rate     = 0.5,
                     col_sample_rate = 0.5,
-                    max_depth       = 15,
+                    max_depth       = 20,
                     learn_rate      = 0.05,
                     seed            = 12345678,
-                    ntrees          = 300)
+                    ntrees          = 400)
 
 summary(gbmHex_c)
 gbm_15_05_300_c = gbmHex_c
-h2o.saveModel(gbm_15_05_300_c, path = '../H2O_models_GBM_15_05_300_v3_c', force = FALSE)
+h2o.saveModel(gbm_15_05_300_c, path = '../H2O_models_GBM_15_05_300_v4_c', force = FALSE)
 
 cat("Predicting Sales\n")
 testHex      <- as.h2o(test)
@@ -265,14 +265,14 @@ gbmHex_d <- h2o.gbm(x               = feats_d,
                     nbins_cats      = 1115,
                     sample_rate     = 0.5,
                     col_sample_rate = 0.5,
-                    max_depth       = 15,
+                    max_depth       = 20,
                     learn_rate      = 0.05,
                     seed            = 12345678,
-                    ntrees          = 300)
+                    ntrees          = 400)
 
 summary(gbmHex_d)
 gbm_15_05_300_d = gbmHex_d
-h2o.saveModel(gbm_15_05_300_d, path = '../H2O_models_GBM_15_05_300_v3_d', force = FALSE)
+h2o.saveModel(gbm_15_05_300_d, path = '../H2O_models_GBM_15_05_300_v4_d', force = FALSE)
 
 cat("Predicting Sales\n")
 testHex      <- as.h2o(test)
@@ -288,6 +288,32 @@ train_pred_d   <- data.frame(Id = train$Id, Sales = train_pred_d)
 write.csv(train_pred_d, "./H2O_submits/h2o_GBM_20_05_300_v3_d_train.csv",row.names=F)
 
 ####################################################################################
+grid_search = data.frame()
+max_weight = 10
+for (i in 0:max_weight) {
+  for (j in 0:(max_weight-i)) {
+    for (k in 0:(max_weight-i-j)) {
+      for (l in 0:(max_weight-i-j-k)) {
+        pred = ((i-max_weight/2)*train_pred_a$Sales +
+                (j-max_weight/2)*train_pred_b$Sales +
+                (k-max_weight/2)*train_pred_c$Sales +
+                (l-max_weight/2)*train_pred_d$Sales +
+                (3*max_weight-i-j-k-l)*train_pred$Sales)/max_weight
+        temp = data.frame(   a=(i-max_weight/2),
+                             b=(j-max_weight/2),
+                             c=(k-max_weight/2), 
+                             d=(j-max_weight/2), 
+                          main=3*max_weight-i-j-k-l,
+                          rmse=sqrt(sum(rmse(pred, train$Sales))/nrow(train)))
+        grid_search = rbind(grid_search, temp)
+      }
+    }
+  }
+}
+
+grid_search
+filter(grid_search, rmse == min(grid_search[,6]))
+head(grid_search[with(grid_search, order(rmse)),],20)
 
 mean(train_pred$Sales)
 mean(train_pred_a$Sales)
@@ -295,10 +321,63 @@ mean(train_pred_b$Sales)
 mean(train_pred_c$Sales)
 mean(train_pred_d$Sales)
 
+pred_ensemb  <- (20*pred2 - 4*pred_a - 2*pred_b - 2*pred_c - 2*pred_d)/10
+mean(pred_ensemb)
+submit_d     <- data.frame(Id = test$Id, Sales = pred_ensemb)
+cat("saving the submission file\n")
+write.csv(submit_d, "./H2O_submits/h2o_GBM_ensemble_v1.csv",row.names=F)
+
+####################################################################################
+features3 = varimps$variable[1:80]
+
+gbmHex3 <- h2o.gbm( x=features3,
+                    y="logSales",
+                    training_frame=trainHex,
+                    model_id="introGBM",
+                    nbins_cats=1115,
+                    sample_rate = 0.5,
+                    col_sample_rate = 0.5,
+                    max_depth = 12,
+                    learn_rate=0.05,
+                    seed = 12345678,
+                    ntrees = 800)
+
+summary(gbmHex3)
+(varimps3 = data.frame(h2o.varimp(gbmHex3)))
+sumup(model = gbmHex3, trainHex = trainHex, train = train)
+gbm_12_05_800_top80 = gbmHex3
+h2o.saveModel(gbm_12_05_800_top80, 
+              path = '/Users/jfdarre/Documents/NYCDS/Project4/H2O_models_GBM_12_05_800_top80', force = FALSE)
+
+cat("Predicting Sales\n")
+testHex3     <- as.h2o(test)
+predictions3 <- as.data.frame(h2o.predict(gbmHex3,testHex3))
+pred3        <- expm1(predictions3[,1])
+summary(pred3)
+
+submission3  <- data.frame(Id=test$Id, Sales=pred3)
+cat("saving the submission file\n")
+write.csv(submission3, "./H2O_submits/h2o_GBM_12_05_800_top80_v2.csv",row.names=F)
+
+train_pred3   <- as.data.frame(h2o.predict(gbmHex3,trainHex))
+train_pred3   <- expm1(train_pred3[,1])
+train_pred3   <- data.frame(Id=train$Id, Sales=train_pred3)
+write.csv(train_pred3, "./H2O_submits/h2o_GBM_12_05_800_top80_train_v2.csv",row.names=F)
+write.csv(varimps3, "./H2O_submits/h2o_GBM_12_05_800_top80_varimp_2.csv",row.names=F)
+
+####################################################################################
+
+pred_ensemb2   <- (2*pred2 + pred_a + pred_b + pred_c + pred_d + 6*pred3)/12
+mean(pred_ensemb2)
+submit_ensemb2 <- data.frame(Id = test$Id, Sales = pred_ensemb2)
+cat("saving the submission file\n")
+write.csv(submit_d, "./H2O_submits/h2o_GBM_ensemble_v2.csv",row.names=F)
+
 
 
 
 ####################################################################################
+
 sub1 <- fread("./H2O_submits/h2o_30_60.csv",stringsAsFactors = T)
 sub2 <- fread("./H2O_submits/h2o_30_80.csv",stringsAsFactors = T)
 sub3 <- fread("./H2O_submits/h2o_50_65.csv",stringsAsFactors = T)
