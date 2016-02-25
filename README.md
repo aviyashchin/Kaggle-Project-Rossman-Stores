@@ -1,5 +1,3 @@
-====================
-
 # Overview
 
 As part of a Kaggle competition, we were challenged by Rossmann, the second largest chain of German drug stores, to predict the daily sales for 6 weeks into the future for more than 1,000 stores. Exploratory data analysis revealed several novel features, including spikes in sales prior to, and preceding store refurbishment. We also engineered several novel features by the inclusion of external data including Google Trends, macroeconomic data, as well as weather data. We then used H20, a fast, scalable parallel-processing engine for machine learning, to build predictive models utilizing random forests, gradient boosting machines, as well as deep learning. Lastly, we combined these models using different ensemble methods to obtain better predictive performance.
